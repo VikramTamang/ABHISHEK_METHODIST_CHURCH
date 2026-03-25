@@ -26,10 +26,9 @@ app.use(express.json());
 // ── Serve uploaded media ──────────────────────────────────────────────────
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// ── Serve the main church website (parent folder) at root ─────────────────
-// This means opening http://localhost:5001 serves index.html — same origin
-// as the API, so all fetch() calls work with no CORS issues.
-app.use(express.static(path.join(__dirname, '..')));
+// ── Serve the full website from the self-contained public/ folder ────────────
+// All HTML, CSS, JS and images are copied into backend/public/ for deployment.
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGO_URI)

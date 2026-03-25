@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "build": "node -e \"const fs=require('fs'),path=require('path'),src=path.join(__dirname,'..'),dest=path.join(__dirname,'public');fs.mkdirSync(dest,{recursive:true});['admin.html','admin.css','admin.js','index.html','style.css','main.js'].forEach(f=>{try{fs.copyFileSync(path.join(src,f),path.join(dest,f));console.log('Copied',f)}catch(e){console.log('Skip',f)}});try{fs.mkdirSync(path.join(dest,'images'),{recursive:true});fs.readdirSync(path.join(src,'images')).forEach(f=>fs.copyFileSync(path.join(src,'images',f),path.join(dest,'images',f)));console.log('Copied images')}catch(e){}\""
   },
   "keywords": [],
   "author": "",
