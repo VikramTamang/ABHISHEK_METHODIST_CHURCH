@@ -1,4 +1,4 @@
-const API_URL = 'http://localhost:5001/api';
+const API_URL = 'https://abhishek-methodist-church.onrender.com/api';
 let token = localStorage.getItem('adminToken');
 
 // DOM Elements
@@ -122,11 +122,11 @@ navItems.forEach(item => {
         e.preventDefault();
         navItems.forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
-        
+
         const targetId = item.getAttribute('data-target');
         adminPanels.forEach(panel => {
             panel.classList.remove('active-panel');
-            if(panel.id === targetId) {
+            if (panel.id === targetId) {
                 panel.classList.add('active-panel');
             }
         });
@@ -149,9 +149,9 @@ async function updateContent(endpoint, payload) {
     try {
         const res = await fetch(`${API_URL}/content/${endpoint}`, {
             method: 'PUT',
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(payload)
         });
@@ -235,7 +235,7 @@ async function loadSectionData(endpoint, containerId) {
     const data = await fetchContent(endpoint);
     const container = document.getElementById(containerId);
     container.innerHTML = '';
-    
+
     if (data && data.length > 0) {
         data.forEach(item => {
             let title = item.title || item.name || 'Item';
@@ -259,19 +259,19 @@ async function loadSectionData(endpoint, containerId) {
 }
 
 async function deleteItem(endpoint, id) {
-    if(confirm('Are you certain you want to delete this?')) {
+    if (confirm('Are you certain you want to delete this?')) {
         try {
             const res = await fetch(`${API_URL}/content/${endpoint}/${id}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
             });
-            if(res.ok) {
+            if (res.ok) {
                 showToast('Deleted successfully');
                 loadSectionData(endpoint, `${endpoint}List`);
             } else {
                 showToast('Failed to delete', 'error');
             }
-        } catch(e) { showToast('Error', 'error'); }
+        } catch (e) { showToast('Error', 'error'); }
     }
 }
 
@@ -288,39 +288,39 @@ let currentItemId = '';
 closeBtn.onclick = () => itemModal.style.display = 'none';
 window.onclick = (e) => { if (e.target == itemModal) itemModal.style.display = 'none'; };
 
-function openModal(endpoint, mode='POST', id='', data={}) {
+function openModal(endpoint, mode = 'POST', id = '', data = {}) {
     currentModalMode = mode;
     currentEndpoint = endpoint;
     currentItemId = id;
-    
+
     document.getElementById('modalTitle').innerText = mode === 'POST' ? `Add ${endpoint}` : `Edit ${endpoint}`;
-    
+
     let html = '';
-    if(endpoint === 'history') {
+    if (endpoint === 'history') {
         html = `
-            <div class="form-group"><label>Year</label><input type="text" id="mYear" value="${data.year||''}" required></div>
-            <div class="form-group"><label>Title</label><input type="text" id="mTitle" value="${data.title||''}" required></div>
-            <div class="form-group"><label>Description</label><textarea id="mDesc" rows="3" required>${data.description||''}</textarea></div>
+            <div class="form-group"><label>Year</label><input type="text" id="mYear" value="${data.year || ''}" required></div>
+            <div class="form-group"><label>Title</label><input type="text" id="mTitle" value="${data.title || ''}" required></div>
+            <div class="form-group"><label>Description</label><textarea id="mDesc" rows="3" required>${data.description || ''}</textarea></div>
         `;
     } else if (endpoint === 'branch') {
         html = `
-            <div class="form-group"><label>Branch Name</label><input type="text" id="mName" value="${data.name||''}" required></div>
-            <div class="form-group"><label>Location</label><input type="text" id="mLoc" value="${data.location||''}" required></div>
-            <div class="form-group"><label>Details / Timings</label><textarea id="mDetails" rows="3">${data.details||''}</textarea></div>
+            <div class="form-group"><label>Branch Name</label><input type="text" id="mName" value="${data.name || ''}" required></div>
+            <div class="form-group"><label>Location</label><input type="text" id="mLoc" value="${data.location || ''}" required></div>
+            <div class="form-group"><label>Details / Timings</label><textarea id="mDetails" rows="3">${data.details || ''}</textarea></div>
             <div class="form-group">
                 <label>Upload Branch Image (Optional)</label>
                 <input type="file" id="mImageFile" accept="image/*">
                 ${data.imageUrl ? `<img src="http://localhost:5000${data.imageUrl}" style="max-width:100px; margin-top:10px;">` : ''}
-                <input type="hidden" id="mImageUrl" value="${data.imageUrl||''}">
+                <input type="hidden" id="mImageUrl" value="${data.imageUrl || ''}">
             </div>
         `;
     } else if (endpoint === 'testimony') {
         html = `
-            <div class="form-group"><label>Name</label><input type="text" id="mName" value="${data.name||''}" required></div>
-            <div class="form-group"><label>Message</label><textarea id="mMessage" rows="4" required>${data.message||''}</textarea></div>
+            <div class="form-group"><label>Name</label><input type="text" id="mName" value="${data.name || ''}" required></div>
+            <div class="form-group"><label>Message</label><textarea id="mMessage" rows="4" required>${data.message || ''}</textarea></div>
         `;
     }
-    
+
     modalInputs.innerHTML = html;
     itemModal.style.display = 'block';
 }
@@ -333,29 +333,29 @@ async function editItem(endpoint, id) {
     const res = await fetch(`${API_URL}/content/${endpoint}`);
     const dataArray = await res.json();
     const item = dataArray.find(d => d._id === id);
-    if(item) openModal(endpoint, 'PUT', id, item);
+    if (item) openModal(endpoint, 'PUT', id, item);
 }
 
 modalForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     let payload = {};
-    if(currentEndpoint === 'history') {
+    if (currentEndpoint === 'history') {
         payload = {
             year: document.getElementById('mYear').value,
             title: document.getElementById('mTitle').value,
             description: document.getElementById('mDesc').value
         };
-    } else if(currentEndpoint === 'testimony') {
+    } else if (currentEndpoint === 'testimony') {
         payload = {
             name: document.getElementById('mName').value,
             message: document.getElementById('mMessage').value
         };
-    } else if(currentEndpoint === 'branch') {
+    } else if (currentEndpoint === 'branch') {
         // Handle file upload first if file exists
         const fileInput = document.getElementById('mImageFile');
         let finalImageUrl = document.getElementById('mImageUrl').value;
-        
+
         if (fileInput.files.length > 0) {
             const formData = new FormData();
             formData.append('image', fileInput.files[0]);
@@ -366,10 +366,10 @@ modalForm.addEventListener('submit', async (e) => {
                     body: formData
                 });
                 const uData = await uRes.json();
-                if(uRes.ok) finalImageUrl = uData.imageUrl;
-            } catch(e) { showToast('Image upload failed', 'error'); }
+                if (uRes.ok) finalImageUrl = uData.imageUrl;
+            } catch (e) { showToast('Image upload failed', 'error'); }
         }
-        
+
         payload = {
             name: document.getElementById('mName').value,
             location: document.getElementById('mLoc').value,
@@ -377,18 +377,18 @@ modalForm.addEventListener('submit', async (e) => {
             imageUrl: finalImageUrl
         };
     }
-    
+
     const url = currentModalMode === 'POST' ? `${API_URL}/content/${currentEndpoint}` : `${API_URL}/content/${currentEndpoint}/${currentItemId}`;
     try {
         const res = await fetch(url, {
             method: currentModalMode,
-            headers: { 
+            headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}` 
+                'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify(payload)
         });
-        
+
         if (res.ok) {
             showToast('Saved successfully');
             itemModal.style.display = 'none';
@@ -396,7 +396,7 @@ modalForm.addEventListener('submit', async (e) => {
         } else {
             showToast('Save failed', 'error');
         }
-    } catch(e) {
+    } catch (e) {
         showToast('Error saving item', 'error');
     }
 });
