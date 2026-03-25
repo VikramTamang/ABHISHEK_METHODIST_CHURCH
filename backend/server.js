@@ -9,18 +9,8 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// ── CORS: allow all localhost origins + null (file://) for local dev ──────
-app.use(cors({
-  origin: function (origin, callback) {
-    // null origin = opened from file:// — allow in dev
-    if (!origin || origin === 'null') return callback(null, true);
-    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
-      return callback(null, true);
-    }
-    callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true
-}));
+// ── CORS: open to all origins — safe because auth uses JWT tokens ─────────
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
 // ── Serve uploaded media ──────────────────────────────────────────────────
@@ -31,7 +21,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
+const mongoUri = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/churchDB';
+if (!process.env.MONGO_URI) console.warn('⚠️  MONGO_URI not set — using local fallback');
+mongoose.connect(mongoUri)
   .then(() => console.log('MongoDB successfully connected'))
   .catch((err) => {
     console.error('MongoDB Connection Error:');
